@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 db = sqlite3.connect("test.db")
 cursor = db.cursor()
-cursor.execute(" create table user (id varchar(20) primary key autoincrement, name varchar(20)" )
+cursor.execute(" create table user (id integer primary key autoincrement, name varchar(20)" )
 cursor.execute('insert into user (name) values (\"wck\")')
 db.commit()
 cursor.close()
