@@ -14,3 +14,6 @@ def detest():
     cursor.execute("select * from user")
     data = cursor.fetchall()
     return render_template("db.html",data=data)
+
+if __init__ == "__name__":
+    app.run(debug=True)
