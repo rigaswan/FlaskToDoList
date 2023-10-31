@@ -3,9 +3,9 @@ import sqlite3
 
 app = Flask(__name__)
 
-db = sqlite3.connect("test.db")
+db = sqlite3.connect("test2.db")
 cursor = db.cursor()
-cursor.execute(" create table user (id integer primary key, name varchar(20)" )
+cursor.execute("create table user (id integer primary key, name varchar(20) )")
 cursor.execute('insert into user (name) values (\"wck\")')
 db.commit()
 cursor.close()
@@ -17,7 +17,7 @@ def index():
 
 @app.route("/dbtest")
 def detest():
-    conn = sqlite3.connect("test.db")
+    conn = sqlite3.connect("test2.db")
     cursor = conn.cursor()
     cursor.execute("select * from user")
     data = cursor.fetchall()
