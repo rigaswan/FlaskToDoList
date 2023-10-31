@@ -15,5 +15,5 @@ def detest():
     data = cursor.fetchall()
     return render_template("db.html",data=data)
 
-if __init__ == "__name__":
+if __name__ == "__main__":
     app.run(debug=True)
