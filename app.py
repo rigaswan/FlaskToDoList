@@ -1,27 +1,38 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect, flash
 import sqlite3
 
 app = Flask(__name__)
 
-db = sqlite3.connect("test2.db")
-cursor = db.cursor()
-cursor.execute("create table user (id integer primary key, name varchar(20) )")
-cursor.execute('insert into user (name) values (\"wck\")')
-db.commit()
-cursor.close()
-db.close()
-
-@app.route("/")
+@app.route("/", methods=["POST", "GET"])
 def index():
-    return "<h1> hello world</h1>"
+    if request.method == "POST":
+        username = request.form.get("username")
+        return "aslkfhd"
+    return render_template("index.html", title = "Homepage")
 
-@app.route("/dbtest")
-def detest():
-    conn = sqlite3.connect("test2.db")
-    cursor = conn.cursor()
-    cursor.execute("select * from user")
-    data = cursor.fetchall()
-    return render_template("db.html",data=data)
+@app.route("/register", methods=["POST", "GET"])
+def register():
+    if request.method == "POST":
+        username = request.form.get("username")
+        password = request.form.get("password")
+        password2 = request.form.get("password2")
+
+        if len(username) < 2:
+            flash("Your username is too short!", category="error")
+        elif password != password2:
+            flash("Password don\'t match!", category="error")
+        else:
+            flash("Account created!", category="success")
+            return redirect("/")
+    return render_template("register.html", title = "Register")
+
+@app.route("/login")
+def login():
+
+    return render_template("login.html", title="Login page")
+
+
 
 if __name__ == "__main__":
+    app.secret_key = 'super secret key'
     app.run(debug=True)
