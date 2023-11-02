@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, flash
 import sqlite3
 
 app = Flask(__name__)
+app.secret_key = 'super secret key'
 
 @app.route("/", methods=["POST", "GET"])
 def index():
@@ -34,5 +35,5 @@ def login():
 
 
 if __name__ == "__main__":
-    app.secret_key = 'super secret key'
+    
     app.run(debug=True)
