@@ -14,10 +14,13 @@
             </button>                        
             <div class="collapse navbar-collapse" id="navbar">
               <div class="navbar-nav">
-                <a class="nav-item nav-link" href="/">Home</a>
+                {% if session.name %}
+                <a class="nav-item nav-link" href="/">{{session.name}}'s Home</a>
+                <a class="nav-item nav-link" href="/logout">Logout</a>
+                {% else %}
                 <a class="nav-item nav-link" href="/login">Login</a>
                 <a class="nav-item nav-link" href="/register">Register</a>
-                <a class="nav-item nav-link" href="/logout">Logout</a>
+                {% endif %}
               </div>
             </div>
           </nav>

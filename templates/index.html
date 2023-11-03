@@ -1,8 +1,50 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    
-    {%for id, data, dt, user_id in todolist%}
-        {{id}}, {{data}} |{{dt}} <br>
-    {% endfor %}
+
+{% if session.name %}
+    <div class="container">
+        <h2 align="left">{{session.name}}'s To-Do-List</h2>
+        {%if todolist %}           
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Things-to-do</th>
+              <th>Date created</th>
+              <th>Done?</th>
+              </tr>
+          </thead>
+
+          <tbody>
+            {%for id, data, dt, user_id in todolist%}
+            <tr>
+              <td>{{data}}</td>
+              <td>{{dt}}</td>
+              <td><form action={{url_for("delete", thingid = id)}} method="post"><button type="submit">&times;</button></form>
+            </tr>
+            {% endfor %}
+
+          </tbody>
+        </table>
+        {%else%}
+        <h1>You have done all your things!</h1>
+        {% endif %}
+        <br>
+    <form action="/" method="post">
+
+        <div class="mb-3" align="left">
+            <label  for="exampleFormControlTextarea1" class="form-label">New Thing-to-do</label>
+            <textarea class="form-control" name="thingtodo" rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary btn-block mb-4">
+            Add
+        </button>
+        
+    </form>
+</div>
+{% else%}
+    please log in
+{% endif %}
+
+
 {% endblock %}

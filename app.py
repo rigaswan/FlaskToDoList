@@ -1,9 +1,15 @@
-from flask import Flask, render_template, request, redirect, flash
+from flask import Flask, render_template, request, redirect, flash, session
 import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_session import Session
+
 
 app = Flask(__name__)
 app.secret_key = 'super secret key'
+# app.config["SESSION_PERMANENT"] = False
+# app.config["SESSION_TYPE"] = "filesystem"
+# Session(app)
+
 
 def get_db_connection():
     conn = sqlite3.connect("TDL.db")
@@ -13,22 +19,49 @@ def get_db_connection():
 @app.route("/", methods=["POST", "GET"])
 def index():
     if request.method == "POST":
-        username = request.form.get("username")
-        return "aslkfhd"
+        
+        newtext = request.form.get("thingtodo")
+        #username = request.form.get("username")
+        print(newtext)
+        if len(newtext) < 1:
+            flash("Please enter your thing-to-do.", category="error")
+            return redirect("/")
+        # insert into data base
+        else:
+            conn = get_db_connection()
+            cursor = conn.cursor() 
+            cursor.execute(
+                    "INSERT INTO todolist (data, user_id) values(?,?); ", 
+                    (newtext,session["user_id"])
+            )
+            conn.commit()
+            cursor.close()
+            conn.close()
+            return redirect("/")
     else:
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        # supppos the user_id is 1
-        cursor.execute(
-                "SELECT * FROM todolist WHERE user_id = ? ;", 
-                (1,)
-        )
-        data = cursor.fetchall()
-        #print(data[0][0])
-        cursor.close()
-        conn.close()
+        if session.get("logged_in"):
+            conn = get_db_connection()
+            cursor = conn.cursor() 
+            cursor.execute(
+                    "SELECT * FROM users WHERE name = ? ;", 
+                    (session["name"],)
+            )
+            result = cursor.fetchone()
+            session["user_id"] = result[0]
+            #print (session["user_id"])
+            # result[0]: user_id | result[1]: username | result[2]: password_hashed
 
-        return render_template("index.html", title = "Homepage", todolist=data)
+            cursor.execute(
+                    "SELECT * FROM todolist WHERE user_id = ? ;", 
+                    (session["user_id"] ,)
+            )
+            data = cursor.fetchall()
+            #print(data[0][0])
+            cursor.close()
+            conn.close()
+
+            return render_template("index.html", title = "Homepage", todolist=data)
+        return redirect("/login")
 
 @app.route("/register", methods=["POST", "GET"])
 def register():
@@ -65,6 +98,8 @@ def register():
             cursor.close()
             conn.close()
 
+            session["logged_in"] = True
+            session["name"] = username
             flash("Account created!", category="success")
             return redirect("/")
     return render_template("register.html", title = "Register")
@@ -82,13 +117,16 @@ def login():
                     (username,)
         )
         result = cursor.fetchone()
-        #print(result[0])
+        # result[0]: user_id | result[1]: username | result[2]: password_hashed
         cursor.close()
         conn.close()   
 
         if result:
             if check_password_hash(result[2],password):
                 user_id = result[0]
+                session["logged_in"] = True
+                session["name"] = result[1]
+                session["user_id"] = result[0]
                 flash("Logged in successfully!", category="success")
                 return redirect("/",)
             else:
@@ -100,6 +138,26 @@ def login():
     return render_template("login.html", title="Login page")
 
 
+@app.route("/logout")
+def logout():
+    session["logged_in"] = False
+    session.pop("name", None)
+    session.pop("user_id",None)
+    flash("You\'re logged out.", category="success")
+    return redirect("/")
+
+@app.route("/delete/<int:thingid>", methods=["GET", "POST"])
+def delete(thingid):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute(
+                "DELETE FROM todolist WHERE id = ? ;", 
+                (thingid,)
+    )
+    conn.commit()
+    cursor.close()
+    conn.close()   
+    return redirect("/")
 
 if __name__ == "__main__":
     
