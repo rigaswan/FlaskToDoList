@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, flash, session
 import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
 #from flask_session import Session
+from datetime import timedelta, datetime
 
 
 app = Flask(__name__)
@@ -30,9 +31,10 @@ def index():
         else:
             conn = get_db_connection()
             cursor = conn.cursor() 
+            hktime=datetime.now()+timedelta(hours=8)
             cursor.execute(
-                    "INSERT INTO todolist (data,dt, user_id) values(?,datetime('now','localtime'),?); ", 
-                    (newtext,session["user_id"])
+                    "INSERT INTO todolist (data,dt, user_id) values(?,?,?); ", 
+                    (newtext,hktime,session["user_id"])
             )
             conn.commit()
             cursor.close()
