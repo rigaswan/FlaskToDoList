@@ -25,13 +25,14 @@ def index():
         #username = request.form.get("username")
         print(newtext)
         if len(newtext) < 1:
-            flash("Please enter your thing-to-do.", category="error")
+            flash("Please enter your thing-to-do.", category="error") 
             return redirect("/")
         # insert into data base
         else:
             conn = get_db_connection()
             cursor = conn.cursor() 
-            hktime=datetime.now()+timedelta(hours=8)
+            detail_hktime=datetime.now()+timedelta(hours=8)
+            hktime=datetime.strftime(detail_hktime, '%Y-%m-%d %H:%M')
             cursor.execute(
                     "INSERT INTO todolist (data,dt, user_id) values(?,?,?); ", 
                     (newtext,hktime,session["user_id"])
