@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% if session.name %}
+
+    <div class="container">
+        <h2 align="left">Next Train</h2>
+        <p align="left">Reloaded at {{ time }}</p>
+        {%if etadata %}            
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>From HKU</th>
+              <th>To Kennedy Town</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {%for train in etadata %}
+            <tr>
+              <td>#{{ train["seq"] }}</td>
+              <td>{{ train["time"] }}</td>
+            </tr>
+            {% endfor %}
+
+          </tbody>
+
+        </table>
+        <div align="right" class="container">
+            <form action="/eta" method="get"><button type="submit" class="btn btn-primary btn-block mb-4">Reload</button></form>
+        </div>        
+        {%else%}
+        <h1>404 Not Found. Error in getting next train data.</h1>
+        {% endif %}
+    </div>
+
+{% else%}
+    please log in
+{% endif %}
+
+{% endblock %}
