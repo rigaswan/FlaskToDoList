@@ -3,6 +3,7 @@ import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
 #from flask_session import Session
 from datetime import timedelta, datetime, timezone
+import pytz
 import requests, json
 
 
@@ -32,8 +33,13 @@ def index():
         else:
             conn = get_db_connection()
             cursor = conn.cursor() 
-            detail_hktime=datetime.now(timezone.utc)+timedelta(hours=8)
-            hktime=datetime.strftime(detail_hktime, '%Y-%m-%d %H:%M')
+            # detail_hktime=datetime.now(timezone.utc)+timedelta(hours=8)
+            # hktime=datetime.strftime(detail_hktime, '%Y-%m-%d %H:%M')
+
+            hktz = pytz.timezone("Asia/Hong_Kong")
+            detail_hktime=datetime.now(hktz)
+            hktime = detail_hktime.strftime("%Y-%m-%d %H:%M")
+
             cursor.execute(
                     "INSERT INTO todolist (data,dt, user_id) values(?,?,?); ", 
                     (newtext,hktime,session["user_id"])
@@ -165,13 +171,12 @@ def delete(thingid):
 
 @app.route("/eta")
 def eta():
-    detail_hktime=datetime.now(timezone.utc)+timedelta(hours=8)
-    current_time = detail_hktime.strftime("%H:%M:%S")
+
     url = "https://rt.data.gov.hk/v1/transport/mtr/getSchedule.php?line=ISL&sta=HKU"
     urljson = requests.get(url)
     etadata = json.loads(urljson.text)
     
-    return render_template("eta.html", title = "Next Train Arrival Time", etadata=etadata["data"]['ISL-HKU']["DOWN"], time=current_time)
+    return render_template("eta.html", title = "Next Train Arrival Time", etadata=etadata["data"]["ISL-HKU"]["UP"], time=etadata["data"]["ISL-HKU"]["curr_time"])
 
 if __name__ == "__main__":
     
