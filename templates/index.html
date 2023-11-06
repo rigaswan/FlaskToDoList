@@ -20,7 +20,7 @@
             <tr>
               <td>{{data}}</td>
               <td>{{dt}}</td>
-              <td><form action={{url_for("delete", thingid = id)}} method="post"><button type="submit">&times;</button></form>
+              <td><form action={{url_for("delete", thingid = id)}} method="post"><button type="submit" class="btn btn-primary btn-block mb-4">&times;</button></form>
             </tr>
             {% endfor %}
 

@@ -3,6 +3,7 @@ import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
 #from flask_session import Session
 from datetime import timedelta, datetime, timezone
+import requests, json
 
 
 app = Flask(__name__)
@@ -161,6 +162,16 @@ def delete(thingid):
     cursor.close()
     conn.close()   
     return redirect("/")
+
+@app.route("/eta")
+def eta():
+    detail_hktime=datetime.now(timezone.utc)+timedelta(hours=8)
+    current_time = detail_hktime.strftime("%H:%M:%S")
+    url = "https://rt.data.gov.hk/v1/transport/mtr/getSchedule.php?line=ISL&sta=HKU"
+    urljson = requests.get(url)
+    etadata = json.loads(urljson.text)
+    
+    return render_template("eta.html", title = "Next Train Arrival Time", etadata=etadata["data"]['ISL-HKU']["DOWN"], time=current_time)
 
 if __name__ == "__main__":
     
