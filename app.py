@@ -169,14 +169,32 @@ def delete(thingid):
     conn.close()   
     return redirect("/")
 
-@app.route("/eta")
-def eta():
-
+@app.route("/etaO")
+def etaO():
     url = "https://rt.data.gov.hk/v1/transport/mtr/getSchedule.php?line=ISL&sta=HKU"
     urljson = requests.get(url)
     etadata = json.loads(urljson.text)
     
-    return render_template("eta.html", title = "Next Train Arrival Time", etadata=etadata["data"]["ISL-HKU"]["UP"], time=etadata["data"]["ISL-HKU"]["curr_time"])
+    return render_template("eta.html", title = "Next Train Arrival Time", etadata=etadata["data"]["ISL-HKU"], time=etadata["data"]["ISL-HKU"]["curr_time"])
+
+@app.route("/eta/<string:station>")
+def eta(station):
+    
+    if station == "WHA":
+        line = "KTL"
+    else:
+        line = "ISL"
+
+    url = f"https://rt.data.gov.hk/v1/transport/mtr/getSchedule.php?line={line}&sta={station}"
+    urljson = requests.get(url)
+    etadata = json.loads(urljson.text)
+    
+    return render_template("eta.html", title = "Next Train Arrival Time", 
+                           etadata=etadata["data"][line+"-"+station],
+                           station = station,
+                           time=etadata["data"][line+"-"+station]["curr_time"]
+                        )
+
 
 if __name__ == "__main__":
     

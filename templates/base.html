@@ -9,21 +9,44 @@
     </head>
     <body>
         <nav class="navbar navbar-expand-lg navbar-light bg-light">
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbar">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown">
                 <span class="navbar-toggler-icon"></span>
-            </button>                        
-            <div class="collapse navbar-collapse" id="navbar">
-              <div class="navbar-nav">
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNavDropdown">
+              <ul class="navbar-nav">
                 {% if session.name %}
-                <a class="nav-item nav-link" href="/">{{session.name}}'s Home</a>
-                <a class="nav-item nav-link" href="/eta">Next Train</a>
-                <a class="nav-item nav-link" href="/logout">Logout</a>
+                <li class="nav-item">
+                  <a class="nav-item nav-link" href="/">{{session.name}}'s Home</a>
+                </li>
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    MTR
+                  </a>
+                  
+                  
+                  <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                    
+                    <a class="dropdown-item" href="/eta/WHA">Whampoa Station</a>
+                    <a class="dropdown-item" href="/eta/HKU">HKU Station</a>
+                  </div>
+                </li>
+
+                <li class="nav-item">
+                  <a class="nav-item nav-link" href="/logout">Logout</a>
+                </li>
+              
                 {% else %}
-                <a class="nav-item nav-link" href="/login">Login</a>
-                <a class="nav-item nav-link" href="/register">Register</a>
+                <li class="nav-item">
+                  <a class="nav-item nav-link" href="/login">Login</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-item nav-link" href="/register">Register</a>
+                </li>
                 {% endif %}
-              </div>
+              </ul>
             </div>
+
           </nav>
     
         {% with messages = get_flashed_messages(with_categories = true) %}

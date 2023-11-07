@@ -6,18 +6,40 @@
 
     <div class="container">
         <h2 align="left">Next Train</h2>
-        <p align="left">Reloaded at {{ time }}</p>
-        {%if etadata %}            
+        <p align="left">Data loaded at {{ time }}</p>
+        {%if etadata["UP"] %}            
         <table class="table table-striped">
           <thead>
             <tr>
-              <th>From HKU</th>
-              <th>To Chai Wan</th>
+              <th>From {{station}}</th>
+              <th>To {{etadata["UP"][0]["dest"]}}</th>
             </tr>
           </thead>
 
           <tbody>
-            {%for train in etadata %}
+            {%for train in etadata["UP"] %}
+            <tr>
+              <td>#{{ train["seq"] }}</td>
+              <td>{{ train["time"] }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>       
+        {%else%}
+        <h1>404 Not Found. Error in getting next train data.</h1>
+        {% endif %}
+
+        {%if etadata["DOWN"] %}            
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>From {{station}}</th>
+              <th>To {{etadata["DOWN"][0]["dest"]}}</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {%for train in etadata["DOWN"] %}
             <tr>
               <td>#{{ train["seq"] }}</td>
               <td>{{ train["time"] }}</td>
@@ -26,13 +48,10 @@
 
           </tbody>
 
-        </table>
-        <div align="right" class="container">
-            <form action="/eta" method="get"><button type="submit" class="btn btn-primary btn-block mb-4">Reload</button></form>
-        </div>        
-        {%else%}
-        <h1>404 Not Found. Error in getting next train data.</h1>
+        </table>       
+
         {% endif %}
+
     </div>
 
 {% else%}
