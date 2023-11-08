@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+{% if session.name %}
+
+<div class="center">
+    <h1> Uploading pdf and Returning text file With OCR</h1>
+    <form method="POST" action="/OCR" enctype="multipart/form-data">
+        <input class="ok" type="file" name="file">
+        <button class="op">OCR</button>
+    </form>
+</div>
+<br>
+<div class="left">
+    <h2> Below is the text extracted</h2>
+    {% for t in text %}
+        {%print(t)%}
+        <br>
+    {% endfor %}
+</div>
+
+
+{% else%}
+    <h1>Please <a href="/login">log in</a> to view the content. </h1>
+{% endif %}
+
+{% endblock %}

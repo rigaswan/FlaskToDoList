@@ -1,10 +1,13 @@
-from flask import Flask, render_template, request, redirect, flash, session
+from flask import Flask, render_template, request, redirect, flash, session, send_file
 import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
-#from flask_session import Session
+from werkzeug.utils import secure_filename
 from datetime import timedelta, datetime, timezone
 import pytz
 import requests, json
+from pdf2image import convert_from_path
+import pytesseract
+from PyPDF2 import PdfReader, PdfWriter
 
 
 app = Flask(__name__)
@@ -169,13 +172,43 @@ def delete(thingid):
     conn.close()   
     return redirect("/")
 
-@app.route("/etaO")
-def etaO():
-    url = "https://rt.data.gov.hk/v1/transport/mtr/getSchedule.php?line=ISL&sta=HKU"
-    urljson = requests.get(url)
-    etadata = json.loads(urljson.text)
+@app.route("/OCR",methods=["GET", "POST"])
+def OCR():
+    if request.method == "POST":
+        file = request.files["file"]
+        filename = secure_filename(file.filename)
+        file.save("temp.pdf")
+        if 'file' not in request.files:
+           print('No file attached in request')
+           return redirect(request.url)
+
+        if filename == "":
+            flash(f"Please choose a pdf to uplaod.", category="error")
+            return redirect (request.url)
+        
+        try:
+            pages = convert_from_path("temp.pdf")
+            # with open("output.txt", 'w', encoding='utf-8') as f:
+            #     for page in pages:
+            #         text = pytesseract.image_to_string(page)
+            #         f.write(text)
+            #         f.write("\n")
+            text = []
+            for page in pages:
+                t = pytesseract.image_to_string(page)
+                text.append(t)
+            
+            flash(f"Text in pdf extracted successfully!", category="success")
+            # return send_file("output.txt", as_attachment=True)
+            return render_template("ocr.html", title = "OCR for pdf", text = text)
+        
+        except Exception as e:
+            print(f"Error: {str(e)}")
+            flash(f"Error in reading the file {filename}.", category="error")
+            return redirect (request.url)
+    else:
+        return render_template("ocr.html", title = "OCR for pdf")
     
-    return render_template("eta.html", title = "Next Train Arrival Time", etadata=etadata["data"]["ISL-HKU"], time=etadata["data"]["ISL-HKU"]["curr_time"])
 
 @app.route("/eta/<string:station>")
 def eta(station):
