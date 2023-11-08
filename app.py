@@ -7,7 +7,6 @@ import pytz
 import requests, json
 from pdf2image import convert_from_path
 import pytesseract
-from PyPDF2 import PdfReader, PdfWriter
 
 
 app = Flask(__name__)
