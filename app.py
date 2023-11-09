@@ -33,22 +33,20 @@ def index():
     if request.method == "POST":
         
         newtext = request.form.get("thingtodo")
-        #username = request.form.get("username")
+        
         print(newtext)
         if len(newtext) < 1:
             flash("Please enter your thing-to-do.", category="error") 
             return redirect("/")
-        # insert into data base
+        
         else:
-            conn = get_db_connection()
-            cursor = conn.cursor() 
-            # detail_hktime=datetime.now(timezone.utc)+timedelta(hours=8)
-            # hktime=datetime.strftime(detail_hktime, '%Y-%m-%d %H:%M')
-
             hktz = pytz.timezone("Asia/Hong_Kong")
             detail_hktime=datetime.now(hktz)
             hktime = detail_hktime.strftime("%Y-%m-%d %H:%M")
 
+            # insert into data base
+            conn = get_db_connection()
+            cursor = conn.cursor() 
             cursor.execute(
                     "INSERT INTO todolist (data,dt, user_id) values(?,?,?); ", 
                     (newtext,hktime,session["user_id"])
@@ -56,6 +54,7 @@ def index():
             conn.commit()
             cursor.close()
             conn.close()
+            
             return redirect("/")
     else:
         if session.get("logged_in"):
@@ -67,15 +66,12 @@ def index():
             )
             result = cursor.fetchone()
             session["user_id"] = result[0]
-            #print (session["user_id"])
-            # result[0]: user_id | result[1]: username | result[2]: password_hashed
 
             cursor.execute(
                     "SELECT * FROM todolist WHERE user_id = ? ;", 
                     (session["user_id"] ,)
             )
             data = cursor.fetchall()
-            #print(data[0][0])
             cursor.close()
             conn.close()
 
@@ -136,7 +132,6 @@ def login():
                     (username,)
         )
         result = cursor.fetchone()
-        # result[0]: user_id | result[1]: username | result[2]: password_hashed
         cursor.close()
         conn.close()   
 

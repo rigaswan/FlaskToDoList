@@ -1,8 +1,12 @@
 # Flask Web Development
 #### Video Demo:  <URL HERE>
-#### Description:
+### Description:
 
-Welcome to my Flask-powered website, accessible [here](http://rigas.pythonanywhere.com/). This web application enhances your productivity and convenience through three distinct services, each designed to make your life easier.
+Welcome to my Flask-powered website, accessible [here](http://rigas.pythonanywhere.com/). This web application enhances your productivity and convenience through three distinct services, each designed to make your life easier. 
+The file [app.py](app.py) is the main python program. It holds the web application. 
+You can find all the html files in the [templates](templates/) folder.
+The [TDL.db](TDL.db) stores the users' data and the corrsponding to-do-list. Sqlite was used for updating the database.
+
 
 ### 1. To-do List:
 Organize your tasks effortlessly with our intuitive to-do list feature. Add new tasks through the user-friendly textarea, and mark them as completed to keep track of your accomplishments. The power to stay organized is now at your fingertips.
