@@ -3,22 +3,34 @@
 {% block content %}
 
 {% if session.name %}
-
-<div class="center">
-    <h1> Uploading pdf and Returning text file With OCR</h1>
+<div class="container">
+    <h2 align="left">Extract text from a pdf or an image with OCR</h2>
+    
     <form method="POST" action="/OCR" enctype="multipart/form-data">
-        <input class="ok" type="file" name="file">
-        <button class="op">OCR</button>
+    <div class="form-group">
+        <input class="form-control-file" type="file" name="file">
+        <button class="btn btn-primary">OCR</button>
+    </div>
     </form>
 </div>
 <br>
-<div class="left">
-    <h2> Below is the text extracted</h2>
-    {% for t in text %}
-        {%print(t)%}
+
+<div class="form-group" align="text-center">
+    <form method="POST" action="/OCR/download/{{filename}}" enctype="multipart/form-data">
+        <h2 >{{filename}}</h2>
         <br>
-    {% endfor %}
+        <textarea class="form-outline w-50 mb-4" id="textextracted" name="textextracted" rows="20" spellcheck="true">        
+            {% for t in text %}
+            {%print(t)%}
+            {% endfor %}
+        </textarea>
+
+
+        <button type="submit" class="btn btn-primary">Download</button>
+    </form>
 </div>
+
+
 
 
 {% else%}

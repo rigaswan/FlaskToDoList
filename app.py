@@ -15,6 +15,13 @@ app.secret_key = 'super secret key'
 # app.config["SESSION_TYPE"] = "filesystem"
 # Session(app)
 
+error404 = '''
+                <!DOCTYPE html>
+                <html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><title>404 Not Found</title>
+                </head><body><h1>Not Found</h1>
+                <p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>
+                </body></html>
+            '''
 
 def get_db_connection():
     conn = sqlite3.connect("TDL.db")
@@ -176,30 +183,32 @@ def OCR():
     if request.method == "POST":
         file = request.files["file"]
         filename = secure_filename(file.filename)
-        file.save("temp.pdf")
+
         if 'file' not in request.files:
            print('No file attached in request')
            return redirect(request.url)
 
         if filename == "":
-            flash(f"Please choose a pdf to uplaod.", category="error")
+            flash(f"Please choose a file to uplaod.", category="error")
             return redirect (request.url)
         
+        if filename[-3:]=="pdf":
+            tempfilename = "temp.pdf"
+        else:
+            tempfilename = f"temp.{filename[-3:]}"
+
+        file.save(tempfilename)
         try:
-            pages = convert_from_path("temp.pdf")
-            # with open("output.txt", 'w', encoding='utf-8') as f:
-            #     for page in pages:
-            #         text = pytesseract.image_to_string(page)
-            #         f.write(text)
-            #         f.write("\n")
+            if filename[-3:]=="pdf":
+                pages = convert_from_path(tempfilename)
+            else:
+                pages = [tempfilename]
+
             text = []
             for page in pages:
                 t = pytesseract.image_to_string(page)
                 text.append(t)
-            
-            flash(f"Text in pdf extracted successfully!", category="success")
-            # return send_file("output.txt", as_attachment=True)
-            return render_template("ocr.html", title = "OCR for pdf", text = text)
+            return render_template("ocr.html", title = "OCR for pdf", text = text, filename = filename)
         
         except Exception as e:
             print(f"Error: {str(e)}")
@@ -208,6 +217,14 @@ def OCR():
     else:
         return render_template("ocr.html", title = "OCR for pdf")
     
+@app.route("/OCR/download/<string:filename>",methods=["POST"])
+def text_download(filename):
+    text = request.form.get("textextracted")
+    textfilename = "output.txt"
+    with open(textfilename, 'w', encoding='utf-8') as f:
+        f.write(filename)
+        f.write(text)
+    return send_file(textfilename, as_attachment=True)
 
 @app.route("/eta/<string:station>")
 def eta(station):
@@ -229,5 +246,4 @@ def eta(station):
 
 
 if __name__ == "__main__":
-    
     app.run(debug=True)
